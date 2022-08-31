@@ -1,13 +1,13 @@
 package aws
 
 import (
+	"encoding/base64"
 	"log"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/eks"
 	"github.com/machado-br/helm-api/adapters/models"
-	"github.com/machado-br/helm-api/infra"
 )
 
 type adapter struct {
@@ -50,15 +50,15 @@ func (a adapter) DescribeCluster() (models.Cluster, error) {
 		return models.Cluster{}, err
 	}
 
-	ca, err := infra.DecodeString(infra.StringValue(result.Cluster.CertificateAuthority.Data))
+	ca, err := base64.StdEncoding.DecodeString(aws.StringValue(result.Cluster.CertificateAuthority.Data))
 	if err != nil {
 		log.Fatalf("Failed while decoding certificate: %v", err)
 	}
 
 	return models.Cluster{
-		Arn:         infra.StringValue(result.Cluster.Arn),
-		Name:        infra.StringValue(result.Cluster.Name),
-		Endpoint:    infra.StringValue(result.Cluster.Endpoint),
+		Arn:         aws.StringValue(result.Cluster.Arn),
+		Name:        aws.StringValue(result.Cluster.Name),
+		Endpoint:    aws.StringValue(result.Cluster.Endpoint),
 		Certificate: ca,
 	}, nil
 }
