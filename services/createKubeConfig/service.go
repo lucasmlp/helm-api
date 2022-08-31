@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/machado-br/helm-api/adapters/k8s"
+	"github.com/machado-br/helm-api/services"
 )
 
 type service struct {
@@ -26,12 +27,14 @@ func (s service) Run() error {
 
 	secret, err := s.k8sAdapter.RetrieveSecret()
 	if err != nil {
-		log.Fatalf("Failed while retrieving k8s secret: %v", err)
+		log.Println(err)
+		return services.ErrK8sSecrets
 	}
 
 	err = s.k8sAdapter.WriteToFile(secret)
 	if err != nil {
-		log.Fatalf("Failed while writing kubeconfig file: %v", err)
+		log.Println(err)
+		return services.ErrWriteKubeConfig
 	}
 
 	return nil

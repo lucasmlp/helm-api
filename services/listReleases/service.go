@@ -1,8 +1,11 @@
 package listReleases
 
 import (
+	"log"
+
 	"github.com/machado-br/helm-api/adapters/helm"
 	"github.com/machado-br/helm-api/adapters/models"
+	"github.com/machado-br/helm-api/services"
 )
 
 type service struct {
@@ -22,10 +25,11 @@ func NewService(
 }
 
 func (s service) Run() ([]models.Release, error) {
-	releases := s.helmAdapter.ListReleases()
-	// if err != nil {
-	// 	return []models.Release{}, errors.New("failed while listing releases")
-	// }
+	releases, err := s.helmAdapter.ListReleases()
+	if err != nil {
+		log.Println(err)
+		return []models.Release{}, services.ErrListReleases
+	}
 
 	return releases, nil
 }

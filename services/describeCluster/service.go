@@ -5,6 +5,7 @@ import (
 
 	"github.com/machado-br/helm-api/adapters/aws"
 	"github.com/machado-br/helm-api/adapters/models"
+	"github.com/machado-br/helm-api/services"
 )
 
 type service struct {
@@ -26,7 +27,8 @@ func NewService(
 func (s service) Run() (models.Cluster, error) {
 	cluster, err := s.cloudProviderAdapter.DescribeCluster()
 	if err != nil {
-		log.Fatalf("Failed while calling DescribeCluster: %v", err)
+		log.Println("Failed while calling DescribeCluster: %v", err)
+		return models.Cluster{}, services.ErrGetClusterInfo
 	}
 
 	return cluster, nil
