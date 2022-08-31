@@ -31,10 +31,7 @@ func (a api) Engine() *gin.Engine {
 
 			c.JSON(http.StatusOK, "pong")
 		})
-	}
-	helmRoot := router.Group("/helm")
-	{
-		helmRoot.GET("", a.allReleases)
+		root.GET("", a.allReleases)
 	}
 
 	return router
