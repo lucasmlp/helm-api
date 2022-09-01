@@ -5,6 +5,8 @@ go 1.18
 require (
 	github.com/aws/aws-sdk-go v1.43.16
 	github.com/gin-gonic/gin v1.8.1
+	github.com/golang/mock v1.6.0
+	github.com/stretchr/testify v1.7.2
 	golang.org/x/net v0.0.0-20220225172249-27dd8689420f
 	helm.sh/helm/v3 v3.9.2
 	k8s.io/apimachinery v0.24.2
@@ -111,7 +113,6 @@ require (
 	github.com/spf13/cast v1.4.1 // indirect
 	github.com/spf13/cobra v1.4.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/stretchr/testify v1.7.2 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	github.com/xeipuuv/gojsonpointer v0.0.0-20180127040702-4e3ac2762d5f // indirect
 	github.com/xeipuuv/gojsonreference v0.0.0-20180127040603-bd5ef7bd5415 // indirect
