@@ -27,7 +27,7 @@ func NewService(
 func (s service) Run() (models.Cluster, error) {
 	cluster, err := s.cloudProviderAdapter.DescribeCluster()
 	if err != nil {
-		log.Println("Failed while calling DescribeCluster: %v", err)
+		log.Println(err)
 		return models.Cluster{}, services.ErrGetClusterInfo
 	}
 
