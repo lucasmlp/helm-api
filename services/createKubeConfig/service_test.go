@@ -11,10 +11,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const (
-	namespace = "dev"
-)
-
 func Test(t *testing.T) {
 	ctrl := gomock.NewController(t)
 
