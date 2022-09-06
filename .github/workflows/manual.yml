@@ -5,7 +5,7 @@ on:
 
 env:
   GO_VERSION: "1.18"
-  ECR_REPOSITORY: k8s-api
+  ECR_REPOSITORY: helm-api
 
 jobs:
   test:
@@ -47,12 +47,11 @@ jobs:
         run: go test ./...
 
   docker-build:
-    name: 🐳 Docker Build
+    name: 🐳 Docker Build & Push
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: dev
-    needs:
-      test
+    needs: test
     steps:
       - name: 🛒 Checkout
         uses: actions/checkout@v2
