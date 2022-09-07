@@ -1,6 +1,9 @@
 package k8s
 
 import (
+	"errors"
+	"fmt"
+	"io/ioutil"
 	"log"
 
 	"github.com/machado-br/helm-api/adapters/models"
@@ -17,6 +20,8 @@ type adapter struct {
 	clientSet *kubernetes.Clientset
 	namespace string
 	region    string
+	token     string
+	deployed  bool
 }
 
 type Adapter interface {
@@ -37,6 +42,8 @@ func NewAdapter(
 	}
 
 	return adapter{
+		deployed:  deployed,
+		token:     token,
 		cluster:   cluster,
 		clientSet: clientSet,
 		namespace: namespace,
@@ -117,16 +124,36 @@ func (a adapter) WriteToFile(certificate []byte) error {
 		},
 	}
 
-	exec := api.ExecConfig{
-		Command:    "aws",
-		Args:       []string{"eks", "get-token", "--region", a.region, "--cluster-name", a.cluster.Name},
-		APIVersion: "client.authentication.k8s.io/v1beta1",
-	}
+	// exec := api.ExecConfig{
+	// 	Command:    "aws",
+	// 	Args:       []string{"eks", "get-token", "--region", a.region, "--cluster-name", a.cluster.Name},
+	// 	APIVersion: "client.authentication.k8s.io/v1beta1",
+	// }
 
-	authInfoList := map[string]*api.AuthInfo{
-		a.cluster.Arn: {
-			Exec: &exec,
-		},
+	var content []byte
+	authInfoList := map[string]*api.AuthInfo{}
+
+	if a.deployed {
+		var err error
+		content, err = ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/token")
+		if err != nil {
+			log.Println(err)
+			return errors.New(fmt.Sprintf("failed while reading service account token: %s", err))
+		}
+
+		log.Printf("content: %v\n", string(content))
+
+		authInfoList = map[string]*api.AuthInfo{
+			a.cluster.Arn: {
+				Token: string(content),
+			},
+		}
+	} else {
+		authInfoList = map[string]*api.AuthInfo{
+			a.cluster.Arn: {
+				Token: a.token,
+			},
+		}
 	}
 
 	clientConfig := api.Config{
