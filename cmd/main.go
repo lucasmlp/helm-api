@@ -34,7 +34,12 @@ func main() {
 		log.Fatalf("failed while retrieving cluster information: %v", err)
 	}
 
-	k8sAdapter, err := k8s.NewAdapter(cluster, namespace, region)
+	token, err := awsAdapter.GetToken()
+	if err != nil {
+		log.Fatalf("failed while generating an aws token: %v", err)
+	}
+
+	k8sAdapter, err := k8s.NewAdapter(cluster, namespace, region, token)
 	if err != nil {
 		log.Fatalf("failed while creating k8s adapter: %v", err)
 	}

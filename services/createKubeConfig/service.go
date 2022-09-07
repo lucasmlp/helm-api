@@ -3,12 +3,14 @@ package createKubeConfig
 import (
 	"log"
 
+	"github.com/machado-br/helm-api/adapters/aws"
 	"github.com/machado-br/helm-api/adapters/k8s"
 	"github.com/machado-br/helm-api/services"
 )
 
 type service struct {
 	k8sAdapter k8s.Adapter
+	awsAdapter aws.Adapter
 }
 
 type Service interface {
@@ -24,7 +26,6 @@ func NewService(
 }
 
 func (s service) Run() error {
-
 	secret, err := s.k8sAdapter.RetrieveSecret()
 	if err != nil {
 		log.Println(err)

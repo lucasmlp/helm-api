@@ -35,5 +35,5 @@ spec:
               value: "default"
             - name: AWS_REGION
               value: "us-west-2"
-      serviceAccountName: helm-api
+      serviceAccountName: my-service-account
       automountServiceAccountToken: true

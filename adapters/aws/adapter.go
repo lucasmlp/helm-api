@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/eks"
 	"github.com/machado-br/helm-api/adapters/models"
+	"sigs.k8s.io/aws-iam-authenticator/pkg/token"
 )
 
 type adapter struct {
@@ -18,6 +19,7 @@ type adapter struct {
 }
 
 type Adapter interface {
+	GetToken() (string, error)
 	DescribeCluster() (models.Cluster, error)
 }
 
@@ -61,4 +63,22 @@ func (a adapter) DescribeCluster() (models.Cluster, error) {
 		Endpoint:    aws.StringValue(result.Cluster.Endpoint),
 		Certificate: ca,
 	}, nil
+}
+
+func (a adapter) GetToken() (string, error) {
+	gen, err := token.NewGenerator(true, false)
+	if err != nil {
+		return "", err
+	}
+
+	opts := &token.GetTokenOptions{
+		ClusterID: a.clusterName,
+	}
+
+	tok, err := gen.GetWithOptions(opts)
+	if err != nil {
+		return "", err
+	}
+
+	return tok.Token, nil
 }

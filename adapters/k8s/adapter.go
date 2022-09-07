@@ -10,7 +10,6 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/clientcmd/api"
-	"sigs.k8s.io/aws-iam-authenticator/pkg/token"
 )
 
 type adapter struct {
@@ -29,8 +28,9 @@ func NewAdapter(
 	cluster models.Cluster,
 	namespace string,
 	region string,
+	token string,
 ) (adapter, error) {
-	clientSet, err := newClientset(cluster)
+	clientSet, err := newClientset(cluster, token)
 	if err != nil {
 		return adapter{}, err
 	}
@@ -43,27 +43,13 @@ func NewAdapter(
 	}, nil
 }
 
-func newClientset(cluster models.Cluster) (*kubernetes.Clientset, error) {
+func newClientset(cluster models.Cluster, token string) (*kubernetes.Clientset, error) {
 	log.Printf("Cluster name: %+v", cluster.Name)
-
-	gen, err := token.NewGenerator(true, false)
-	if err != nil {
-		return nil, err
-	}
-
-	opts := &token.GetTokenOptions{
-		ClusterID: cluster.Name,
-	}
-
-	tok, err := gen.GetWithOptions(opts)
-	if err != nil {
-		return nil, err
-	}
 
 	clientset, err := kubernetes.NewForConfig(
 		&rest.Config{
 			Host:        cluster.Endpoint,
-			BearerToken: tok.Token,
+			BearerToken: token,
 			TLSClientConfig: rest.TLSClientConfig{
 				CAData: cluster.Certificate,
 			},
