@@ -46,11 +46,11 @@ func Test(t *testing.T) {
 
 		err = service.Run("", false)
 		if err == nil {
-			t.Fatalf("Should have failed by '%s', got nothing", services.ErrListReleases)
+			t.Fatalf("Should have failed by '%s', got nothing", services.ErrUninstallRelease)
 		}
 
-		if err.Error() != services.ErrListReleases.Error() {
-			t.Fatalf("Should have failed by '%s', got '%s'", services.ErrListReleases, err.Error())
+		if err.Error() != services.ErrUninstallRelease.Error() {
+			t.Fatalf("Should have failed by '%s', got '%s'", services.ErrUninstallRelease, err.Error())
 		}
 	})
 }

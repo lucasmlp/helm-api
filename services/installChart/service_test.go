@@ -47,11 +47,11 @@ func Test(t *testing.T) {
 
 		err = service.Run("", false, models.Chart{})
 		if err == nil {
-			t.Fatalf("Should have failed by '%s', got nothing", services.ErrListReleases)
+			t.Fatalf("Should have failed by '%s', got nothing", services.ErrInstallChart)
 		}
 
-		if err.Error() != services.ErrListReleases.Error() {
-			t.Fatalf("Should have failed by '%s', got '%s'", services.ErrListReleases, err.Error())
+		if err.Error() != services.ErrInstallChart.Error() {
+			t.Fatalf("Should have failed by '%s', got '%s'", services.ErrInstallChart, err.Error())
 		}
 	})
 }
