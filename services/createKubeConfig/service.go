@@ -26,6 +26,9 @@ func NewService(
 }
 
 func (s service) Run() error {
+	opName := "createKubeConfig.Run"
+	log.Printf("entering %v", opName)
+
 	secret, err := s.k8sAdapter.RetrieveSecret()
 	if err != nil {
 		log.Println(err)

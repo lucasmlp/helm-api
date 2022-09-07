@@ -44,6 +44,11 @@ func NewAdapter(
 }
 
 func newClientset(cluster models.Cluster, token string) (*kubernetes.Clientset, error) {
+	opName := "newClientset"
+	log.Printf("entering %v", opName)
+	log.Printf("cluster: %v\n", cluster)
+	log.Printf("token: %v\n", token)
+
 	log.Printf("Cluster name: %+v", cluster.Name)
 
 	clientset, err := kubernetes.NewForConfig(
@@ -64,6 +69,9 @@ func newClientset(cluster models.Cluster, token string) (*kubernetes.Clientset, 
 }
 
 func (a adapter) RetrieveSecret() ([]byte, error) {
+	opName := "RetrieveSecret"
+	log.Printf("entering %v", opName)
+
 	secretList, err := a.clientSet.CoreV1().Secrets(a.namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return nil, err
@@ -79,6 +87,9 @@ func (a adapter) RetrieveSecret() ([]byte, error) {
 }
 
 func (a adapter) WriteToFile(certificate []byte) error {
+	opName := "WriteToFile"
+	log.Printf("entering %v", opName)
+
 	clustersList := map[string]*api.Cluster{
 		a.cluster.Arn: {
 			Server:                   a.cluster.Endpoint,

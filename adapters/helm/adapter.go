@@ -34,6 +34,8 @@ func NewAdapter(
 	}, nil
 }
 func (a adapter) ListReleases() ([]models.Release, error) {
+	opName := "ListReleases"
+	log.Printf("entering %v", opName)
 
 	listAction := action.NewList(a.action)
 	releases, err := listAction.Run()
@@ -46,6 +48,9 @@ func (a adapter) ListReleases() ([]models.Release, error) {
 }
 
 func mapToReleaseModel(releases []*release.Release) []models.Release {
+	opName := "mapToReleaseModel"
+	log.Printf("entering %v", opName)
+
 	releaseList := []models.Release{}
 	for _, release := range releases {
 		releaseList = append(releaseList, models.Release{

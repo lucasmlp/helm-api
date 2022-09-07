@@ -42,6 +42,8 @@ func NewAdapter(
 }
 
 func (a adapter) DescribeCluster() (models.Cluster, error) {
+	opName := "DescribeCluster"
+	log.Printf("entering %v", opName)
 
 	input := &eks.DescribeClusterInput{
 		Name: aws.String(a.clusterName),
@@ -66,6 +68,9 @@ func (a adapter) DescribeCluster() (models.Cluster, error) {
 }
 
 func (a adapter) GetToken() (string, error) {
+	opName := "GetToken"
+	log.Printf("entering %v", opName)
+
 	gen, err := token.NewGenerator(true, false)
 	if err != nil {
 		return "", err

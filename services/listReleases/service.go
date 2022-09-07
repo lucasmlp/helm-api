@@ -25,6 +25,9 @@ func NewService(
 }
 
 func (s service) Run() ([]models.Release, error) {
+	opName := "listReleases.Run"
+	log.Printf("entering %v", opName)
+
 	releases, err := s.helmAdapter.ListReleases()
 	if err != nil {
 		log.Println(err)
