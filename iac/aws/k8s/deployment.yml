@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: helm-api
-          image: us-east1-docker.pkg.dev/test-2022-09/helm-api/latest
+          image: 774429751797.dkr.ecr.us-west-2.amazonaws.com/helm-api:latest
           ports:
             - containerPort: 8080
           resources:
@@ -36,3 +36,4 @@ spec:
             - name: AWS_REGION
               value: "us-west-2"
       serviceAccountName: helm-api
+      automountServiceAccountToken: true
