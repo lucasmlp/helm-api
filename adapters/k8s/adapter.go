@@ -1,6 +1,7 @@
 package k8s
 
 import (
+	"io/ioutil"
 	"log"
 
 	"github.com/machado-br/helm-api/adapters/models"
@@ -10,7 +11,6 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/clientcmd/api"
-	"sigs.k8s.io/aws-iam-authenticator/pkg/token"
 )
 
 type adapter struct {
@@ -18,6 +18,8 @@ type adapter struct {
 	clientSet *kubernetes.Clientset
 	namespace string
 	region    string
+	token     string
+	deployed  bool
 }
 
 type Adapter interface {
@@ -29,13 +31,17 @@ func NewAdapter(
 	cluster models.Cluster,
 	namespace string,
 	region string,
+	token string,
+	deployed bool,
 ) (adapter, error) {
-	clientSet, err := newClientset(cluster)
+	clientSet, err := newClientset(cluster, token, deployed)
 	if err != nil {
 		return adapter{}, err
 	}
 
 	return adapter{
+		deployed:  deployed,
+		token:     token,
 		cluster:   cluster,
 		clientSet: clientSet,
 		namespace: namespace,
@@ -43,32 +49,30 @@ func NewAdapter(
 	}, nil
 }
 
-func newClientset(cluster models.Cluster) (*kubernetes.Clientset, error) {
-	log.Printf("Cluster name: %+v", cluster.Name)
+func newClientset(cluster models.Cluster, token string, deployed bool) (*kubernetes.Clientset, error) {
+	opName := "newClientset"
+	log.Printf("entering %v", opName)
 
-	gen, err := token.NewGenerator(true, false)
-	if err != nil {
-		return nil, err
-	}
+	clientset := &kubernetes.Clientset{}
+	config := &rest.Config{}
 
-	opts := &token.GetTokenOptions{
-		ClusterID: cluster.Name,
-	}
-
-	tok, err := gen.GetWithOptions(opts)
-	if err != nil {
-		return nil, err
-	}
-
-	clientset, err := kubernetes.NewForConfig(
-		&rest.Config{
+	if deployed {
+		var err error
+		config, err = rest.InClusterConfig()
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		config = &rest.Config{
 			Host:        cluster.Endpoint,
-			BearerToken: tok.Token,
+			BearerToken: token,
 			TLSClientConfig: rest.TLSClientConfig{
 				CAData: cluster.Certificate,
 			},
-		},
-	)
+		}
+	}
+
+	clientset, err := kubernetes.NewForConfig(config)
 
 	if err != nil {
 		return nil, err
@@ -78,13 +82,17 @@ func newClientset(cluster models.Cluster) (*kubernetes.Clientset, error) {
 }
 
 func (a adapter) RetrieveSecret() ([]byte, error) {
+	opName := "RetrieveSecret"
+	log.Printf("entering %v", opName)
+
+	rest.InClusterConfig()
 	secretList, err := a.clientSet.CoreV1().Secrets(a.namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return nil, err
 	}
 
 	if len(secretList.Items) == 0 {
-		log.Panicln("Secret list is empty")
+		return []byte{}, err
 	}
 
 	secret := secretList.Items[0].Data["ca.crt"]
@@ -93,6 +101,9 @@ func (a adapter) RetrieveSecret() ([]byte, error) {
 }
 
 func (a adapter) WriteToFile(certificate []byte) error {
+	opName := "WriteToFile"
+	log.Printf("entering %v", opName)
+
 	clustersList := map[string]*api.Cluster{
 		a.cluster.Arn: {
 			Server:                   a.cluster.Endpoint,
@@ -107,16 +118,27 @@ func (a adapter) WriteToFile(certificate []byte) error {
 		},
 	}
 
-	exec := api.ExecConfig{
-		Command:    "aws",
-		Args:       []string{"eks", "get-token", "--region", a.region, "--cluster-name", a.cluster.Name},
-		APIVersion: "client.authentication.k8s.io/v1beta1",
-	}
+	var content []byte
+	authInfoList := map[string]*api.AuthInfo{}
 
-	authInfoList := map[string]*api.AuthInfo{
-		a.cluster.Arn: {
-			Exec: &exec,
-		},
+	if a.deployed {
+		var err error
+		content, err = ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/token")
+		if err != nil {
+			return err
+		}
+
+		authInfoList = map[string]*api.AuthInfo{
+			a.cluster.Arn: {
+				Token: string(content),
+			},
+		}
+	} else {
+		authInfoList = map[string]*api.AuthInfo{
+			a.cluster.Arn: {
+				Token: a.token,
+			},
+		}
 	}
 
 	clientConfig := api.Config{

@@ -25,6 +25,9 @@ func NewService(
 }
 
 func (s service) Run() (models.Cluster, error) {
+	opName := "describeCluster.Run"
+	log.Printf("entering %v", opName)
+
 	cluster, err := s.cloudProviderAdapter.DescribeCluster()
 	if err != nil {
 		log.Println(err)

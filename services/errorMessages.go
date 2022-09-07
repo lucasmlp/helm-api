@@ -2,7 +2,6 @@ package services
 
 import "errors"
 
-
 var (
 	ErrK8sSecrets = errors.New("failed while retrieving k8s secret")
 

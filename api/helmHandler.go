@@ -8,8 +8,7 @@ import (
 )
 
 func (a api) allReleases(c *gin.Context) {
-	log.Println("GET /orders")
-	log.Printf("ClientIP: %s\n", c.ClientIP())
+	log.Println("GET /helm")
 
 	releases, err := a.ListReleasesService.Run()
 	if err != nil {
