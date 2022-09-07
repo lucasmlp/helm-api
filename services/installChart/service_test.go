@@ -25,7 +25,7 @@ func Test(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		err := service.Run()
+		err = service.Run("", false, models.Chart{})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -38,14 +38,14 @@ func Test(t *testing.T) {
 		adapterMock := mocks.NewMockAdapter(ctrl)
 
 		errM := errors.New("mock-error")
-		adapterMock.EXPECT().ListReleases().Return([]models.Release{}, errM)
+		adapterMock.EXPECT().InstallChart(gomock.Any(), gomock.Any(), gomock.Any()).Return(errM)
 
 		service, err := NewService(adapterMock)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		_, err = service.Run()
+		err = service.Run("", false, models.Chart{})
 		if err == nil {
 			t.Fatalf("Should have failed by '%s', got nothing", services.ErrListReleases)
 		}
