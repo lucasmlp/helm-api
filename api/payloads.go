@@ -5,5 +5,4 @@ type InstallChartPayload struct {
 	ChartName	string	`json:"chartName"  binding:"required"`
 	RepoURL		string	`json:"repoURL"  binding:"required"`
 	Version 	string 	`json:"version"  binding:"required"`
-	DryRun 		bool	`json:"dryRun"  binding:"required"`
 }

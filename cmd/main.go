@@ -13,6 +13,7 @@ import (
 	"github.com/machado-br/helm-api/services/describeCluster"
 	"github.com/machado-br/helm-api/services/installChart"
 	"github.com/machado-br/helm-api/services/listReleases"
+	"github.com/machado-br/helm-api/services/uninstallRelease"
 )
 
 func main() {
@@ -80,10 +81,15 @@ func main() {
 
 	installChartService, err := installChart.NewService(helmAdapter)
 	if err != nil {
-		log.Fatalf("failed while creating list releases service: %v", err)
+		log.Fatalf("failed while creating install chart service: %v", err)
 	}
 
-	api, err := api.NewApi(listReleasesService, installChartService)
+	uninstallReleaseService, err := uninstallRelease.NewService(helmAdapter)
+	if err != nil {
+		log.Fatalf("failed while creating uninstall release service: %v", err)
+	}
+
+	api, err := api.NewApi(listReleasesService, installChartService, uninstallReleaseService)
 	if err != nil {
 		log.Fatalf("failed while creating api: %v", err)
 	}

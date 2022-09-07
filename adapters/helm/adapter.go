@@ -24,7 +24,8 @@ type adapter struct {
 
 type Adapter interface {
 	ListReleases() ([]models.Release, error)
-	InstallChart(releaseName string, dryRun bool, chart models.Chart) (error)
+	InstallChart(releaseName string, dryRun bool, chart models.Chart) error
+	UninstallRelease(releaseName string, dryRun bool) error
 }
 
 func NewAdapter(
@@ -77,7 +78,7 @@ func mapToReleaseModel(releases []*release.Release) []models.Release {
 	return releaseList
 }
 
-func (a adapter) InstallChart(releaseName string, dryRun bool, chart models.Chart) (error) {
+func (a adapter) InstallChart(releaseName string, dryRun bool, chart models.Chart) error {
 	opName := "InstallChart"
 	log.Printf("entering %v", opName)
 
@@ -146,4 +147,20 @@ func loadAndValidate(chartPath string) (*chart.Chart, error) {
 	}
 
 	return chart, nil
+}
+
+func (a adapter) UninstallRelease(releaseName string, dryRun bool) error {
+	opName := "UninstallRelease"
+	log.Printf("entering %v", opName)
+
+	client := action.NewUninstall(a.action)
+	client.DryRun = dryRun
+	
+	_, err := client.Run(releaseName)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	
+	return nil
 }

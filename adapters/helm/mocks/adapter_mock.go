@@ -62,3 +62,17 @@ func (mr *MockAdapterMockRecorder) ListReleases() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListReleases", reflect.TypeOf((*MockAdapter)(nil).ListReleases))
 }
+
+// UninstallRelease mocks base method.
+func (m *MockAdapter) UninstallRelease(releaseName string, dryRun bool) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UninstallRelease", releaseName, dryRun)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UninstallRelease indicates an expected call of UninstallRelease.
+func (mr *MockAdapterMockRecorder) UninstallRelease(releaseName, dryRun interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UninstallRelease", reflect.TypeOf((*MockAdapter)(nil).UninstallRelease), releaseName, dryRun)
+}
