@@ -29,8 +29,9 @@ func NewAdapter(
 	namespace string,
 	region string,
 	token string,
+	deployed bool,
 ) (adapter, error) {
-	clientSet, err := newClientset(cluster, token)
+	clientSet, err := newClientset(cluster, token, deployed)
 	if err != nil {
 		return adapter{}, err
 	}
@@ -43,7 +44,7 @@ func NewAdapter(
 	}, nil
 }
 
-func newClientset(cluster models.Cluster, token string) (*kubernetes.Clientset, error) {
+func newClientset(cluster models.Cluster, token string, deployed bool) (*kubernetes.Clientset, error) {
 	opName := "newClientset"
 	log.Printf("entering %v", opName)
 	log.Printf("cluster: %v\n", cluster)
@@ -51,15 +52,26 @@ func newClientset(cluster models.Cluster, token string) (*kubernetes.Clientset, 
 
 	log.Printf("Cluster name: %+v", cluster.Name)
 
-	clientset, err := kubernetes.NewForConfig(
-		&rest.Config{
+	clientset := &kubernetes.Clientset{}
+	config := &rest.Config{}
+
+	if deployed {
+		var err error
+		config, err = rest.InClusterConfig()
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		config = &rest.Config{
 			Host:        cluster.Endpoint,
 			BearerToken: token,
 			TLSClientConfig: rest.TLSClientConfig{
 				CAData: cluster.Certificate,
 			},
-		},
-	)
+		}
+	}
+
+	clientset, err := kubernetes.NewForConfig(config)
 
 	if err != nil {
 		return nil, err
@@ -72,6 +84,7 @@ func (a adapter) RetrieveSecret() ([]byte, error) {
 	opName := "RetrieveSecret"
 	log.Printf("entering %v", opName)
 
+	rest.InClusterConfig()
 	secretList, err := a.clientSet.CoreV1().Secrets(a.namespace).List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return nil, err

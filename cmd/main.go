@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/machado-br/helm-api/adapters/aws"
 	"github.com/machado-br/helm-api/adapters/helm"
@@ -18,6 +19,10 @@ func main() {
 	name := os.Getenv("CLUSTER_NAME")
 	region := os.Getenv("AWS_REGION")
 	namespace := os.Getenv("NAMESPACE")
+	deployed, err := strconv.ParseBool(os.Getenv("DEPLOYED"))
+	if err != nil {
+		log.Fatalf("failed to parse deployed env var: %v", err)
+	}
 
 	awsAdapter, err := aws.NewAdapter(region, name)
 	if err != nil {
@@ -39,7 +44,7 @@ func main() {
 		log.Fatalf("failed while generating an aws token: %v", err)
 	}
 
-	k8sAdapter, err := k8s.NewAdapter(cluster, namespace, region, token)
+	k8sAdapter, err := k8s.NewAdapter(cluster, namespace, region, token, deployed)
 	if err != nil {
 		log.Fatalf("failed while creating k8s adapter: %v", err)
 	}
