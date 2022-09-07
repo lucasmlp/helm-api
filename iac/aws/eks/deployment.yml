@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: e-commerce-api
-          image: 774429751797.dkr.ecr.us-west-2.amazonaws.com/helm-api:master
+          image: 774429751797.dkr.ecr.us-west-2.amazonaws.com/helm-api:latest
           ports:
             - containerPort: 8080
           resources:
@@ -35,3 +35,4 @@ spec:
               value: "default"
             - name: AWS_REGION
               value: "us-west-2"
+      serviceAccountName: helm-api
