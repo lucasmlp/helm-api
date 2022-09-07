@@ -47,3 +47,15 @@ docker-push-aws:
 	@ echo "Pushing docker image to AWS ECR..."
 	@ echo
 	@ docker push 774429751797.dkr.ecr.us-west-2.amazonaws.com/helm-api:latest
+
+docker-tag-gcloud:
+	@ echo
+	@ echo "Tagging docker image for GCloud..."
+	@ echo
+	@ docker tag machado-br/helm-api:latest us-east1-docker.pkg.dev/test-2022-09/helm-api/latest
+
+docker-push-gcloud:
+	@ echo
+	@ echo "Pushing docker image to GCloud Artifact Registry..."
+	@ echo
+	@ docker push us-east1-docker.pkg.dev/test-2022-09/helm-api/latest
