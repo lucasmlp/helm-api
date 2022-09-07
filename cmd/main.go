@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/machado-br/helm-api/adapters/aws"
+	"github.com/machado-br/helm-api/adapters/gcloud"
 	"github.com/machado-br/helm-api/adapters/helm"
 	"github.com/machado-br/helm-api/adapters/k8s"
 	"github.com/machado-br/helm-api/api"
@@ -19,9 +20,16 @@ func main() {
 	region := os.Getenv("AWS_REGION")
 	namespace := os.Getenv("NAMESPACE")
 
+	gcloudAdapter, err := gcloud.NewAdapter(region, name)
+	if err != nil {
+		log.Fatalf("failed while creating google cloud adapter: %v", err)
+	}
+
+	gcloudAdapter.DescribeCluster()
+
 	awsAdapter, err := aws.NewAdapter(region, name)
 	if err != nil {
-		log.Fatalf("failed while creating cloud provider adapter: %v", err)
+		log.Fatalf("failed while creating aws adapter: %v", err)
 	}
 
 	describeClusterService, err := describeCluster.NewService(awsAdapter)

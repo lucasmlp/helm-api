@@ -24,7 +24,7 @@ type Adapter interface {
 
 var (
 	projectID = flag.String("project", "test-2022-09", "Project ID")
-	zone      = flag.String("zone", "us-east1", "Compute zone")
+	zone      = flag.String("zone", "us-central1-a", "Compute zone")
 )
 
 func NewAdapter(
@@ -64,17 +64,26 @@ func (a adapter) DescribeCluster() {
 		log.Fatalf("Could not initialize gke client: %v", err)
 	}
 
+	region := "us-central1-a"
+	cluster := "my-cluster"
+	location := "projects/" + *projectID + "/locations/" + region + "/clusters/" + cluster
+	clusterInfo := svc.Projects.Locations.Clusters.Get(location)
+	fmt.Printf("clusterInfo: %v\n", clusterInfo)
+
 	if err := listClusters(svc, *projectID, *zone); err != nil {
 		log.Fatal(err)
 	}
 }
 
 func listClusters(svc *container.Service, projectID, zone string) error {
-	list, err := svc.Projects.Zones.Clusters.List(projectID, zone).Do()
+	location := "projects/" + projectID + "/locations/" + zone
+	list, err := svc.Projects.Locations.Clusters.List(location).Do()
 	if err != nil {
 		return fmt.Errorf("failed to list clusters: %v", err)
 	}
 	for _, v := range list.Clusters {
+		fmt.Printf("v: %v\n", v)
+
 		fmt.Printf("Cluster %q (%s) master_version: v%s", v.Name, v.Status, v.CurrentMasterVersion)
 
 		poolList, err := svc.Projects.Zones.Clusters.NodePools.List(projectID, zone, v.Name).Do()
