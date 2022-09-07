@@ -11,6 +11,7 @@ import (
 	"github.com/machado-br/helm-api/api"
 	"github.com/machado-br/helm-api/services/createKubeConfig"
 	"github.com/machado-br/helm-api/services/describeCluster"
+	"github.com/machado-br/helm-api/services/installChart"
 	"github.com/machado-br/helm-api/services/listReleases"
 )
 
@@ -19,6 +20,7 @@ func main() {
 	name := os.Getenv("CLUSTER_NAME")
 	region := os.Getenv("AWS_REGION")
 	namespace := os.Getenv("NAMESPACE")
+	chartDirectory := os.Getenv("CHART_DIRECTORY")
 
 	deployed, err := strconv.ParseBool(os.Getenv("DEPLOYED"))
 	if err != nil {
@@ -66,7 +68,7 @@ func main() {
 
 	helmDriver := os.Getenv("HELM_DRIVER")
 
-	helmAdapter, err := helm.NewAdapter(namespace, kubeconfigPath, helmDriver)
+	helmAdapter, err := helm.NewAdapter(namespace, kubeconfigPath, helmDriver, chartDirectory)
 	if err != nil {
 		log.Fatalf("failed while creating helm adapter: %v", err)
 	}
@@ -76,7 +78,12 @@ func main() {
 		log.Fatalf("failed while creating list releases service: %v", err)
 	}
 
-	api, err := api.NewApi(listReleasesService)
+	installChartService, err := installChart.NewService(helmAdapter)
+	if err != nil {
+		log.Fatalf("failed while creating list releases service: %v", err)
+	}
+
+	api, err := api.NewApi(listReleasesService, installChartService)
 	if err != nil {
 		log.Fatalf("failed while creating api: %v", err)
 	}

@@ -34,6 +34,20 @@ func (m *MockAdapter) EXPECT() *MockAdapterMockRecorder {
 	return m.recorder
 }
 
+// InstallChart mocks base method.
+func (m *MockAdapter) InstallChart(releaseName string, dryRun bool, chart models.Chart) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "InstallChart", releaseName, dryRun, chart)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// InstallChart indicates an expected call of InstallChart.
+func (mr *MockAdapterMockRecorder) InstallChart(releaseName, dryRun, chart interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InstallChart", reflect.TypeOf((*MockAdapter)(nil).InstallChart), releaseName, dryRun, chart)
+}
+
 // ListReleases mocks base method.
 func (m *MockAdapter) ListReleases() ([]models.Release, error) {
 	m.ctrl.T.Helper()

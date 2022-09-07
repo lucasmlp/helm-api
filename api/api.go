@@ -5,18 +5,22 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/machado-br/helm-api/services/installChart"
 	"github.com/machado-br/helm-api/services/listReleases"
 )
 
 type api struct {
-	ListReleasesService listReleases.Service
+	listReleasesService listReleases.Service
+	installChartService installChart.Service
 }
 
 func NewApi(
-	ListReleasesService listReleases.Service,
+	listReleasesService listReleases.Service,
+	installChartService installChart.Service,
 ) (api, error) {
 	return api{
-		ListReleasesService: ListReleasesService,
+		listReleasesService: listReleasesService,
+		installChartService: installChartService,
 	}, nil
 }
 
@@ -32,6 +36,7 @@ func (a api) Engine() *gin.Engine {
 			c.JSON(http.StatusOK, "pong")
 		})
 		root.GET("", a.allReleases)
+		root.POST("", a.installChart)
 	}
 
 	return router
