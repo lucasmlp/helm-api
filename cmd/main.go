@@ -19,6 +19,7 @@ func main() {
 	name := os.Getenv("CLUSTER_NAME")
 	region := os.Getenv("AWS_REGION")
 	namespace := os.Getenv("NAMESPACE")
+
 	deployed, err := strconv.ParseBool(os.Getenv("DEPLOYED"))
 	if err != nil {
 		log.Fatalf("failed to parse deployed env var: %v", err)

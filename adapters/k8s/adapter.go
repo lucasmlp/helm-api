@@ -1,8 +1,6 @@
 package k8s
 
 import (
-	"errors"
-	"fmt"
 	"io/ioutil"
 	"log"
 
@@ -54,10 +52,6 @@ func NewAdapter(
 func newClientset(cluster models.Cluster, token string, deployed bool) (*kubernetes.Clientset, error) {
 	opName := "newClientset"
 	log.Printf("entering %v", opName)
-	log.Printf("cluster: %v\n", cluster)
-	log.Printf("token: %v\n", token)
-
-	log.Printf("Cluster name: %+v", cluster.Name)
 
 	clientset := &kubernetes.Clientset{}
 	config := &rest.Config{}
@@ -98,7 +92,7 @@ func (a adapter) RetrieveSecret() ([]byte, error) {
 	}
 
 	if len(secretList.Items) == 0 {
-		log.Panicln("Secret list is empty")
+		return []byte{}, err
 	}
 
 	secret := secretList.Items[0].Data["ca.crt"]
@@ -124,12 +118,6 @@ func (a adapter) WriteToFile(certificate []byte) error {
 		},
 	}
 
-	// exec := api.ExecConfig{
-	// 	Command:    "aws",
-	// 	Args:       []string{"eks", "get-token", "--region", a.region, "--cluster-name", a.cluster.Name},
-	// 	APIVersion: "client.authentication.k8s.io/v1beta1",
-	// }
-
 	var content []byte
 	authInfoList := map[string]*api.AuthInfo{}
 
@@ -137,11 +125,8 @@ func (a adapter) WriteToFile(certificate []byte) error {
 		var err error
 		content, err = ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/token")
 		if err != nil {
-			log.Println(err)
-			return errors.New(fmt.Sprintf("failed while reading service account token: %s", err))
+			return err
 		}
-
-		log.Printf("content: %v\n", string(content))
 
 		authInfoList = map[string]*api.AuthInfo{
 			a.cluster.Arn: {

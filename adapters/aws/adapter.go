@@ -56,7 +56,7 @@ func (a adapter) DescribeCluster() (models.Cluster, error) {
 
 	ca, err := base64.StdEncoding.DecodeString(aws.StringValue(result.Cluster.CertificateAuthority.Data))
 	if err != nil {
-		log.Fatalf("Failed while decoding certificate: %v", err)
+		return models.Cluster{}, err
 	}
 
 	return models.Cluster{

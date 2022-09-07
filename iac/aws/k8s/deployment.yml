@@ -37,5 +37,7 @@ spec:
               value: "us-west-2"
             - name: DEPLOYED
               value: "true"
+            - name: GIN_MODE
+              value: "release"
       serviceAccountName: helm-api
       automountServiceAccountToken: true
