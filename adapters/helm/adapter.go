@@ -81,14 +81,14 @@ func (a adapter) InstallChart(releaseName string, dryRun bool, chart models.Char
 	opName := "InstallChart"
 	log.Printf("entering %v", opName)
 
-	chartDirectory, err := ioutil.TempDir("", a.chartDirectory)
+	chartDirectory, err := ioutil.TempDir("", "charts")
 	if err != nil {
 		log.Println(err)
 		return nil
 	}
 	defer os.RemoveAll(chartDirectory)
 
-	pulledChart := a.pullChart(chart)
+	pulledChart := a.pullChart(chart, chartDirectory)
 
 	client := action.NewInstall(a.action)
 
@@ -105,7 +105,7 @@ func (a adapter) InstallChart(releaseName string, dryRun bool, chart models.Char
 	return nil
 }
 
-func (a adapter) pullChart(chart models.Chart) *chart.Chart {
+func (a adapter) pullChart(chart models.Chart, chartDirectory string) *chart.Chart {
 	opName := "pullChart"
 	log.Printf("entering %v", opName)
 
@@ -113,7 +113,7 @@ func (a adapter) pullChart(chart models.Chart) *chart.Chart {
 
 	client.RepoURL = chart.RepoURL
 	client.Settings = a.settings
-	client.DestDir = a.chartDirectory
+	client.DestDir = chartDirectory
 	client.Version = chart.Version
 
 	_, err := client.Run(chart.Name)
@@ -122,7 +122,7 @@ func (a adapter) pullChart(chart models.Chart) *chart.Chart {
 		return nil
 	}
 	
-	validatedChart, err := loadAndValidate(a.chartDirectory + "/" + chart.Name + "-" + chart.Version + ".tgz")
+	validatedChart, err := loadAndValidate(chartDirectory + "/" + chart.Name + "-" + chart.Version + ".tgz")
 	if err != nil {
 		log.Println(err)
 	}
