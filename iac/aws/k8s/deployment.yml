@@ -23,10 +23,10 @@ spec:
             - containerPort: 8080
           resources:
             requests:
-              memory: "64Mi"
+              memory: "256Mi"
               cpu: "250m"
             limits:
-              memory: "128Mi"
+              memory: "512Mi"
               cpu: "500m"
           env:
             - name: CLUSTER_NAME
@@ -35,9 +35,14 @@ spec:
               value: "default"
             - name: AWS_REGION
               value: "us-west-2"
-            - name: DEPLOYED
-              value: "true"
             - name: GIN_MODE
               value: "release"
+            - name: DEPLOYED
+              value: "true"
+            - name: DEPLOYED_K8S_ENDPOINT
+              value: "https://kubernetes.default.svc"
+            - name: DEPLOYED_CERTIFICATE_PATH
+              value: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+            - name: DEPLOYED_TOKEN_PATH
+              value: "/var/run/secrets/kubernetes.io/serviceaccount/token"
       serviceAccountName: helm-api
-      automountServiceAccountToken: true
