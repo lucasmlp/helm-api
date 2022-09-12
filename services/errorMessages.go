@@ -10,4 +10,8 @@ var (
 	ErrGetClusterInfo = errors.New("failed while retrieving cluster information")
 
 	ErrListReleases = errors.New("failed while listing releases")
+
+	ErrInstallChart = errors.New("failed while installing chart")
+
+	ErrUninstallRelease = errors.New("failed while uninstalling release")
 )

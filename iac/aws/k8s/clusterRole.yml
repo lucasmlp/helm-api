@@ -8,12 +8,17 @@ rules:
   - apiGroups:
       - "*"
     resources:
-      - configmaps
-      - endpoints
-      - nodes
-      - pods
       - secrets
+      - deployments
+      - services
+      - serviceaccounts
+      - configmaps
+      - persistentvolumeclaims
     verbs:
       - list
       - watch
       - get
+      - create
+      - update
+      - patch
+      - delete

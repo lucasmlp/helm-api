@@ -33,31 +33,16 @@ func (m *MockAdapter) EXPECT() *MockAdapterMockRecorder {
 	return m.recorder
 }
 
-// RetrieveSecret mocks base method.
-func (m *MockAdapter) RetrieveSecret() ([]byte, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RetrieveSecret")
-	ret0, _ := ret[0].([]byte)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// RetrieveSecret indicates an expected call of RetrieveSecret.
-func (mr *MockAdapterMockRecorder) RetrieveSecret() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetrieveSecret", reflect.TypeOf((*MockAdapter)(nil).RetrieveSecret))
-}
-
 // WriteToFile mocks base method.
-func (m *MockAdapter) WriteToFile(certificate []byte) error {
+func (m *MockAdapter) WriteToFile() error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "WriteToFile", certificate)
+	ret := m.ctrl.Call(m, "WriteToFile")
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // WriteToFile indicates an expected call of WriteToFile.
-func (mr *MockAdapterMockRecorder) WriteToFile(certificate interface{}) *gomock.Call {
+func (mr *MockAdapterMockRecorder) WriteToFile() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteToFile", reflect.TypeOf((*MockAdapter)(nil).WriteToFile), certificate)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WriteToFile", reflect.TypeOf((*MockAdapter)(nil).WriteToFile))
 }

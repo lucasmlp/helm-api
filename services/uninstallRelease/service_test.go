@@ -1,12 +1,11 @@
-package describeCluster
+package uninstallRelease
 
 import (
 	"errors"
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/machado-br/helm-api/adapters/aws/mocks"
-	"github.com/machado-br/helm-api/adapters/models"
+	"github.com/machado-br/helm-api/adapters/helm/mocks"
 	"github.com/machado-br/helm-api/services"
 	"github.com/stretchr/testify/assert"
 )
@@ -18,20 +17,19 @@ func Test(t *testing.T) {
 
 		adapterMock := mocks.NewMockAdapter(ctrl)
 
-		adapterMock.EXPECT().DescribeCluster().Return(models.Cluster{}, nil)
+		adapterMock.EXPECT().UninstallRelease(gomock.Any(), gomock.Any()).Return(nil)
 
 		service, err := NewService(adapterMock)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		cluster, err := service.Run()
+		err = service.Run("", false)
 		if err != nil {
 			t.Fatal(err)
 		}
 
 		assert.NoError(t, err)
-		assert.NotNil(t, cluster)
 	})
 
 	t.Run("Failure responses", func(t *testing.T) {
@@ -39,20 +37,20 @@ func Test(t *testing.T) {
 		adapterMock := mocks.NewMockAdapter(ctrl)
 
 		errM := errors.New("mock-error")
-		adapterMock.EXPECT().DescribeCluster().Return(models.Cluster{}, errM)
+		adapterMock.EXPECT().UninstallRelease(gomock.Any(), gomock.Any()).Return(errM)
 
 		service, err := NewService(adapterMock)
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		_, err = service.Run()
+		err = service.Run("", false)
 		if err == nil {
-			t.Fatalf("Should have failed by '%s', got nothing", services.ErrGetClusterInfo)
+			t.Fatalf("Should have failed by '%s', got nothing", services.ErrUninstallRelease)
 		}
 
-		if err.Error() != services.ErrGetClusterInfo.Error() {
-			t.Fatalf("Should have failed by '%s', got '%s'", services.ErrGetClusterInfo, err.Error())
+		if err.Error() != services.ErrUninstallRelease.Error() {
+			t.Fatalf("Should have failed by '%s', got '%s'", services.ErrUninstallRelease, err.Error())
 		}
 	})
 }
