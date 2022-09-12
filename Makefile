@@ -34,19 +34,19 @@ docker-tag-aws:
 	@ echo
 	@ echo "Tagging docker image for AWS..."
 	@ echo
-	@ docker tag machado-br/helm-api:latest 774429751797.dkr.ecr.us-west-2.amazonaws.com/helm-api:latest
+	@ docker tag machado-br/helm-api:latest ${AWS_ACCOUNT}.dkr.ecr.us-west-2.amazonaws.com/helm-api:latest
 
 login-aws-ecr:
 	@ echo
 	@ echo "Logging in AWS ECR..."
 	@ echo
-	@ aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin 774429751797.dkr.ecr.us-west-2.amazonaws.com
+	@ aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin ${AWS_ACCOUNT}.dkr.ecr.us-west-2.amazonaws.com
 
 docker-push-aws:
 	@ echo
 	@ echo "Pushing docker image to AWS ECR..."
 	@ echo
-	@ docker push 774429751797.dkr.ecr.us-west-2.amazonaws.com/helm-api:latest
+	@ docker push ${AWS_ACCOUNT}.dkr.ecr.us-west-2.amazonaws.com/helm-api:latest
 
 docker-tag-gcloud:
 	@ echo
