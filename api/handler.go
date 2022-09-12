@@ -38,9 +38,9 @@ func (a api) installChart(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
-	
+
 	chart := models.Chart{
-		Name: chartPayload.ChartName,
+		Name:    chartPayload.ChartName,
 		Version: chartPayload.Version,
 		RepoURL: chartPayload.RepoURL,
 	}
@@ -51,10 +51,11 @@ func (a api) installChart(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, "")
+	c.Status(http.StatusCreated)
+	return
 }
 
-func (a api) uninstallRelease(c *gin.Context){
+func (a api) uninstallRelease(c *gin.Context) {
 	log.Println("DELETE /name?dryRun")
 
 	releaseName := c.Param("name")
@@ -71,5 +72,6 @@ func (a api) uninstallRelease(c *gin.Context){
 		return
 	}
 
-	c.JSON(http.StatusOK, "")
+	c.Status(http.StatusNoContent)
+	return
 }

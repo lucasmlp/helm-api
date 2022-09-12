@@ -18,9 +18,7 @@ func Test(t *testing.T) {
 
 		adapterMock := mocks.NewMockAdapter(ctrl)
 
-		adapterMock.EXPECT().RetrieveSecret().Return([]byte{}, nil)
-
-		adapterMock.EXPECT().WriteToFile(gomock.Any()).Return(nil)
+		adapterMock.EXPECT().WriteToFile().Return(nil)
 
 		service, err := NewService(adapterMock)
 		if err != nil {
@@ -46,24 +44,12 @@ func Test(t *testing.T) {
 			adapterMock func(context.Context, *gomock.Controller) *mocks.MockAdapter
 		}{
 			{
-				name:    "Failed while retrieving k8s secret",
-				errMock: services.ErrK8sSecrets,
-				adapterMock: func(context.Context, *gomock.Controller) *mocks.MockAdapter {
-					adapterMock := mocks.NewMockAdapter(ctrl)
-
-					adapterMock.EXPECT().RetrieveSecret().Return(nil, adapterErrorMock)
-
-					return adapterMock
-				},
-			},
-			{
 				name:    "Failed while writing kubeconfig file",
 				errMock: services.ErrWriteKubeConfig,
 				adapterMock: func(context.Context, *gomock.Controller) *mocks.MockAdapter {
 					adapterMock := mocks.NewMockAdapter(ctrl)
 
-					adapterMock.EXPECT().RetrieveSecret().Return([]byte{}, nil)
-					adapterMock.EXPECT().WriteToFile(gomock.Any()).Return(adapterErrorMock)
+					adapterMock.EXPECT().WriteToFile().Return(adapterErrorMock)
 
 					return adapterMock
 				},

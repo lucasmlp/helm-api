@@ -16,9 +16,9 @@ import (
 )
 
 type adapter struct {
-	action *action.Configuration
-	settings *cli.EnvSettings
-	namespace string
+	action         *action.Configuration
+	settings       *cli.EnvSettings
+	namespace      string
 	chartDirectory string
 }
 
@@ -33,19 +33,26 @@ func NewAdapter(
 	configPath string,
 	driver string,
 	chartDirectory string,
+	deployed bool,
 ) (adapter, error) {
 
 	actionConfig := new(action.Configuration)
-	if err := actionConfig.Init(kube.GetConfig(configPath, "", namespace), namespace, driver, log.Printf); err != nil {
-		log.Fatalln(err)
+	if deployed {
+		if err := actionConfig.Init(kube.GetConfig(configPath, "", namespace), namespace, driver, log.Printf); err != nil {
+			log.Fatalln(err)
+		}
+	} else {
+		if err := actionConfig.Init(cli.New().RESTClientGetter(), namespace, driver, log.Printf); err != nil {
+			log.Fatalln(err)
+		}
 	}
 
 	settings := cli.New()
 
 	return adapter{
-		settings: settings,
-		action: actionConfig,
-		namespace: namespace,
+		settings:       settings,
+		action:         actionConfig,
+		namespace:      namespace,
 		chartDirectory: chartDirectory,
 	}, nil
 }
@@ -102,7 +109,7 @@ func (a adapter) InstallChart(releaseName string, dryRun bool, chart models.Char
 		log.Println(err)
 		return err
 	}
-	
+
 	return nil
 }
 
@@ -122,7 +129,7 @@ func (a adapter) pullChart(chart models.Chart, chartDirectory string) *chart.Cha
 		log.Println(err)
 		return nil
 	}
-	
+
 	validatedChart, err := loadAndValidate(chartDirectory + "/" + chart.Name + "-" + chart.Version + ".tgz")
 	if err != nil {
 		log.Println(err)
@@ -155,12 +162,12 @@ func (a adapter) UninstallRelease(releaseName string, dryRun bool) error {
 
 	client := action.NewUninstall(a.action)
 	client.DryRun = dryRun
-	
+
 	_, err := client.Run(releaseName)
 	if err != nil {
 		log.Println(err)
 		return err
 	}
-	
+
 	return nil
 }
