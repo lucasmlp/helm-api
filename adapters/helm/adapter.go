@@ -89,7 +89,7 @@ func (a adapter) InstallChart(releaseName string, dryRun bool, chart models.Char
 	opName := "InstallChart"
 	log.Printf("entering %v", opName)
 
-	chartDirectory, err := ioutil.TempDir("", "charts")
+	chartDirectory, err := ioutil.TempDir("", a.chartDirectory)
 	if err != nil {
 		log.Println(err)
 		return nil
